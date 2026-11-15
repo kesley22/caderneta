@@ -1,5 +1,5 @@
 // Service worker do Caderneta. Mude o número da versão quando quiser forçar atualização do cache.
-const CACHE = 'caderneta-v1';
+const CACHE = 'caderneta-v3';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -20,9 +20,9 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const sameOrigin = new URL(req.url).origin === location.origin;
   if (req.mode === 'navigate') {
-    // Páginas: tenta a internet primeiro (pega atualizações) e usa o cache se estiver offline.
+    // Páginas: tenta a internet primeiro, ignorando o cache do navegador (pega atualizações na hora), e usa a cópia guardada se estiver offline.
     e.respondWith(
-      fetch(req).then((res) => {
+      fetch(req.url, { cache: 'no-store' }).then((res) => {
         const copy = res.clone();
         caches.open(CACHE).then((c) => c.put(req, copy));
         return res;
